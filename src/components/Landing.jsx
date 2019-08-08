@@ -56,7 +56,7 @@ class Landing extends React.Component {
           <Card className={classes.card}>
             <CardContent>
               <Typography variant="h5" align="center">
-                Say Goodbye To Insecure Messaging Forever
+                Say Goodbye To Insecure Messaging, Forever
               </Typography>
             </CardContent>
             <CardActions className={classes.cardActions}>
