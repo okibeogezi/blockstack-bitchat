@@ -1,0 +1,27 @@
+[
+  {
+    "ShortName": "USD",
+    "FullName": "US Dollar",
+    "Symbol": "$"
+  },
+  {
+    "ShortName": "EUR",
+    "FullName": "Euro",
+    "Symbol": "€"
+  },
+  {
+    "ShortName": "GBP",
+    "FullName": "Pound Sterling",
+    "Symbol": "€"
+  },
+  {
+    "ShortName": "JPY",
+    "FullName": "Japanese Yen",
+    "Symbol": "¥"
+  },
+  {
+    "ShortName": "NGN",
+    "FullName": "Nigerian Naira",
+    "Symbol": "₦"
+  }
+]

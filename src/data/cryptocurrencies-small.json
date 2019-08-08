@@ -1,0 +1,114 @@
+{
+  "Data": {
+    "BTC": {
+      "ImageUrl": "/media/19633/btc.png",
+      "Name": "BTC",
+      "Symbol": "BTC",
+      "CoinName": "Bitcoin",
+      "SortOrder": 1
+    },
+    "ETH": {
+      "ImageUrl": "/media/20646/eth_logo.png",
+      "Name": "ETH",
+      "Symbol": "ETH",
+      "CoinName": "Ethereum",
+      "SortOrder": 2
+    },
+    "LTC": {
+      "ImageUrl": "/media/35309662/ltc.png",
+      "Name": "LTC",
+      "Symbol": "LTC",
+      "CoinName": "Litecoin",
+      "SortOrder": 3
+    },
+    "DASH": {
+      "ImageUrl": "/media/33842920/dash.png",
+      "Name": "DASH",
+      "Symbol": "DASH",
+      "CoinName": "Dash",
+      "SortOrder": 4
+    },
+    "XMR": {
+      "ImageUrl": "/media/19969/xmr.png",
+      "Name": "XMR",
+      "Symbol": "XMR",
+      "CoinName": "Monero",
+      "SortOrder": 5
+    },
+    "NXT": {
+      "ImageUrl": "/media/20627/nxt.png",
+      "Name": "NXT",
+      "Symbol": "NXT",
+      "CoinName": "Nxt",
+      "SortOrder": 6
+    },
+    "ETC": {
+      "ImageUrl": "/media/33752295/etc_new.png",
+      "Name": "ETC",
+      "Symbol": "ETC",
+      "CoinName": "Ethereum Classic",
+      "SortOrder": 7
+    },
+    "DOGE": {
+      "ImageUrl": "/media/19684/doge.png",
+      "Name": "DOGE",
+      "Symbol": "DOGE",
+      "CoinName": "Dogecoin",
+      "SortOrder": 8
+    },
+    "ZEC": {
+      "ImageUrl": "/media/351360/zec.png",
+      "Name": "ZEC",
+      "Symbol": "ZEC",
+      "CoinName": "ZCash",
+      "SortOrder": 9
+    },
+    "BTS": {
+      "ImageUrl": "/media/20705/bts.png",
+      "Name": "BTS",
+      "Symbol": "BTS",
+      "CoinName": "Bitshares",
+      "SortOrder": 10
+    },
+    "DGB": {
+      "ImageUrl": "/media/12318264/7638-nty_400x400.jpg",
+      "Name": "DGB",
+      "Symbol": "DGB",
+      "CoinName": "DigiByte",
+      "SortOrder": 11
+    },
+    "XRP": {
+      "ImageUrl": "/media/34477776/xrp.png",
+      "Name": "XRP",
+      "Symbol": "XRP",
+      "CoinName": "XRP",
+      "SortOrder": 12
+    },
+    "BTCD": {
+      "ImageUrl": "/media/19630/btcd_1.png",
+      "Name": "BTCD",
+      "Symbol": "BTCD",
+      "CoinName": "BitcoinDark",
+      "SortOrder": 13
+    },
+    "PPC": {
+      "ImageUrl": "/media/19864/peercoin-logo.png",
+      "Name": "PPC",
+      "Symbol": "PPC",
+      "CoinName": "PeerCoin",
+      "SortOrder": 14
+    },
+    "CRAIG": {
+      "ImageUrl": "/media/20022/craig.png",
+      "Name": "CRAIG",
+      "Symbol": "CRAIG",
+      "CoinName": "CraigsCoin",
+      "SortOrder": 15
+    }
+  },
+  "BaseImageUrl": "https://www.cryptocompare.com",
+  "BaseLinkUrl": "https://www.cryptocompare.com",
+  "RateLimit": {},
+  "HasWarning": false,
+  "Type": 100
+}
