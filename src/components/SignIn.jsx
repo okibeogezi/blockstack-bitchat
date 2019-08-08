@@ -61,7 +61,7 @@ const styles = (theme => ({
     flexWrap: 'wrap',
   },
   appBar: {
-    backgroundColor: '#2A7FFF'
+    backgroundColor: '#00D4AA'
   },
   iconInButton: {
     marginRight: theme.spacing(1),

@@ -192,12 +192,12 @@ class Chat extends React.Component {
                     <CardContent 
                       style={{ 
                         paddingBottom: '16px',
-                        backgroundColor: `${message.to === this.from ? 'lightgrey' : '#2A7FFF'}`
+                        backgroundColor: `${message.to === this.from ? 'lightgrey' : '#00D4AA'}`
                       }} 
                       className={classes.messageCardContent}>
                       <Typography 
                         style={{
-                          color: `${message.to === this.from ? '#2A7FFF' : 'white'}`,
+                          color: `${message.to === this.from ? '#00D4AA' : 'white'}`,
                           fontWeight: `${message.to === this.from ? '500' : '400'}`
                         }}
                         className={classes.messageText}>

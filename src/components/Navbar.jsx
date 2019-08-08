@@ -144,7 +144,7 @@ const styles = (theme => ({
     flexGrow: 1,
   },
   appBar: {
-    backgroundColor: '#2A7FFF'
+    // backgroundColor: '#00D4AA'
   },
   iconInButton: {
     marginRight: theme.spacing(1),
