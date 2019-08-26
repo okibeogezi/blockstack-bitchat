@@ -10,7 +10,7 @@ export default class BlockStackUtils {
   }
 
   static isSignedInOrPending (that) {
-    // return true;
+    return true;
     const session = that.userSession;
 
     if (session.isUserSignedIn()) {
@@ -47,9 +47,11 @@ export default class BlockStackUtils {
   }
 
   // Query: https://core.blockstack.org/v1/search?query=okibeogezi.id.blockstack
-  static async checkIfUserExists (fullName) {
+  static async checkIfUserExists (username) {
     try {
-      const res = await fetch(`https://core.blockstack.org/v1/search?query=${fullName}`);
+      let res = await fetch(`https://core.blockstack.org/v1/search?query=${username}`);
+      res = await res.json();
+      console.log('Username check:', res);
       return res.results.length !== 0;
     }
     catch (e) {
@@ -57,46 +59,46 @@ export default class BlockStackUtils {
     }
   }
 
-  static _genFriendsFileName (that) {
-    return 'friends.json';
-  }
+  // static _genFriendsFileName (that) {
+  //   return 'friends.json';
+  // }
 
-  static _genMessagesFileName (that, from, to) {
-    const fileName = from > to ? `${from}-and-${to}` : `${to}-and-${from}`;
-    console.log('Messages File Name', fileName);
-    return fileName;
-  }
+  // static _genMessagesFileName (that, from, to) {
+  //   const fileName = from > to ? `${from}-and-${to}` : `${to}-and-${from}`;
+  //   console.log('Messages File Name', fileName);
+  //   return fileName;
+  // }
 
   /**
    * loads all a user's friends
    * by reading from a gaia file that conatins all the friends
    * @param {*} that The context of the component
    */
-  static async loadFriends (that) {
-    return await BlockStackUtils._demoLoadFriends();
-    BlockStackUtils._assertInit(that);
-    const fileStr = await that.userSession
-      .getFile(BlockStackUtils._genFriendsFileName(that), { decrypt: true });
-    return JSON.parse(fileStr);
-  }
+  // static async loadFriends (that) {
+  //   return await BlockStackUtils._demoLoadFriends();
+  //   BlockStackUtils._assertInit(that);
+  //   const fileStr = await that.userSession
+  //     .getFile(BlockStackUtils._genFriendsFileName(that), { decrypt: true });
+  //   return JSON.parse(fileStr);
+  // }
 
-  static async addFriend (that, name) {
-    BlockStackUtils._assertInit(that);
-    // Read
-    const fileStr = await that.userSession
-      .getFile(BlockStackUtils._genFriendsFileName(that), { decrypt: true }) || '[]';
-    const friends = JSON.parse(fileStr);
-    // Modify
-    friends.push({ name });
-    // Write
-    await that.userSession
-      .putFile(BlockStackUtils._genFriendsFileName(that), JSON.stringify(friends), 
-        { encrypt: true });
-    return friends;
-  }
+  // static async addFriend (that, name) {
+  //   BlockStackUtils._assertInit(that);
+  //   // Read
+  //   const fileStr = await that.userSession
+  //     .getFile(BlockStackUtils._genFriendsFileName(that), { decrypt: true }) || '[]';
+  //   const friends = JSON.parse(fileStr);
+  //   // Modify
+  //   friends.push({ name });
+  //   // Write
+  //   await that.userSession
+  //     .putFile(BlockStackUtils._genFriendsFileName(that), JSON.stringify(friends), 
+  //       { encrypt: true });
+  //   return friends;
+  // }
 
-  static _getUsername (that) {
-    return that.userSession.store.getSessionData().username;
+  static getUsername (that) {
+    return that.userSession.store.getSessionData().username || 'mikeogezi.id.blockstack';
   }
 
   /**
@@ -106,17 +108,17 @@ export default class BlockStackUtils {
    * @param {*} from Senders fullName
    * @param {*} to Receivers fullName
    */
-  static async loadMessages (that, from, to) {
-    return await BlockStackUtils._demoLoadMessages();
-    const username = BlockStackUtils._getUsername(that);
-    BlockStackUtils._assertInit(that);
-    const fileStr = await that.userSession
-      .getFile(BlockStackUtils._genMessagesFileName(that), { 
-        decrypt: false,
-        username
-      }) || '[]';
-    return JSON.parse(fileStr);
-  }
+  // static async loadMessages (that, from, to) {
+  //   return await BlockStackUtils._demoLoadMessages();
+  //   const username = BlockStackUtils.getUsername(that);
+  //   BlockStackUtils._assertInit(that);
+  //   const fileStr = await that.userSession
+  //     .getFile(BlockStackUtils._genMessagesFileName(that), { 
+  //       decrypt: false,
+  //       username
+  //     }) || '[]';
+  //   return JSON.parse(fileStr);
+  // }
 
   /**
    * Sends a message from one user to another 
@@ -126,65 +128,65 @@ export default class BlockStackUtils {
    * @param {*} from Sender fullName
    * @param {*} to Receiver fullName
    */
-  static async sendMessage (that, messageBody, from, to) {
-    const username = BlockStackUtils._getUsername(that);
-    BlockStackUtils._assertInit(that);
-    // Read from messages file
-    const fileStr = await that.userSession
-      .getFile(BlockStackUtils._genMessagesFileName(that), { 
-        decrypt: false,
-        username
-      });
-    const messages = JSON.parse(fileStr);
-    // Add message
-    messages.push({
-      to, from, timestamp: Date.now(), body: messageBody, type: 'text'
-    });
-    // Write to messages file
-    await that.userSession
-      .putFile(BlockStackUtils._genMessagesFileName(that), JSON.stringify(messages), { 
-        encrpyt: false,
-        username
-      });
-    // Return updated messages
-    return messages;
-  }
+  // static async sendMessage (that, messageBody, from, to) {
+  //   const username = BlockStackUtils.getUsername(that);
+  //   BlockStackUtils._assertInit(that);
+  //   // Read from messages file
+  //   const fileStr = await that.userSession
+  //     .getFile(BlockStackUtils._genMessagesFileName(that), { 
+  //       decrypt: false,
+  //       username
+  //     });
+  //   const messages = JSON.parse(fileStr);
+  //   // Add message
+  //   messages.push({
+  //     to, from, timestamp: Date.now(), body: messageBody, type: 'text'
+  //   });
+  //   // Write to messages file
+  //   await that.userSession
+  //     .putFile(BlockStackUtils._genMessagesFileName(that), JSON.stringify(messages), { 
+  //       encrpyt: false,
+  //       username
+  //     });
+  //   // Return updated messages
+  //   return messages;
+  // }
 
-  static checkMessagesPeriodically (that, onReceive) {
+  // static checkMessagesPeriodically (that, onReceive) {
     
-  }
+  // }
 
-  static async _demoLoadFriends (that) {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    return BlockStackUtils.demoFriends;
-  }
+  // static async _demoLoadFriends (that) {
+  //   await new Promise(resolve => setTimeout(resolve, 2000));
+  //   return BlockStackUtils.demoFriends;
+  // }
 
-  static async _demoLoadMessages (that) {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    return BlockStackUtils.demoMessages;
-  }
+  // static async _demoLoadMessages (that) {
+  //   await new Promise(resolve => setTimeout(resolve, 2000));
+  //   return BlockStackUtils.demoMessages;
+  // }
 
-  static demoFriends = [
-    { name: 'moxiegirl.id.blockstack' },
-    { name: 'okibeogezi.id.blockstack' },
-    { name: 'ryanfields.id.blockstack' }
-  ]
+  // static demoFriends = [
+  //   { name: 'moxiegirl.id.blockstack' },
+  //   { name: 'okibeogezi.id.blockstack' },
+  //   { name: 'ryanfields.id.blockstack' }
+  // ]
 
-  static demoMessages = [
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Hey Moxie Girl!', type: 'text' },
-    { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'Hello Mikey!!', type: 'text' },
-    { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'How\'s It Going?', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Im Doing Excellent.', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'You?', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Hey Moxie Girl!', type: 'text' },
-    { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'Hello Mikey!!', type: 'text' },
-    { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'How\'s It Going?', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Im Doing Excellent.', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'You?', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Hey Moxie Girl!', type: 'text' },
-    { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'Hello Mikey!!', type: 'text' },
-    { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'How\'s It Going?', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent.', type: 'text' },
-    { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'You?', type: 'text' }
-  ];
+  // static demoMessages = [
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Hey Moxie Girl!', type: 'text' },
+  //   { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'Hello Mikey!!', type: 'text' },
+  //   { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'How\'s It Going?', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Im Doing Excellent.', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'You?', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Hey Moxie Girl!', type: 'text' },
+  //   { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'Hello Mikey!!', type: 'text' },
+  //   { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'How\'s It Going?', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Im Doing Excellent.', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'You?', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Hey Moxie Girl!', type: 'text' },
+  //   { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'Hello Mikey!!', type: 'text' },
+  //   { to: 'okibeogezi.id.blockstack', from: 'moxiegirl.id.blockstack', timestamp: Date.now(), body: 'How\'s It Going?', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent. Im Doing Excellent.', type: 'text' },
+  //   { to: 'moxiegirl.id.blockstack', from: 'okibeogezi.id.blockstack', timestamp: Date.now(), body: 'You?', type: 'text' }
+  // ];
 }

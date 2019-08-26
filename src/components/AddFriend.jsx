@@ -16,6 +16,7 @@ import {
 import { PersonAdd } from '@material-ui/icons';
 import Header from './Header';
 import BlockStackUtils from '../lib/BlockStackUtils';
+import FirebaseUtils from '../lib/FirebaseUtils';
 import { Redirect } from 'react-router-dom';
 
 // Query: https://core.blockstack.org/v1/search?query=okibeogezi.id.blockstack
@@ -24,67 +25,67 @@ class AddFriend extends React.Component {
     super(props);
 
     this.state = { 
-      fullName: '',
-      isFullNameValid: null,
-      errorCheckingFullName: false,
-      errorInvalidFullName: false
+      friendUsername: '',
+      isUserameValid: null,
+      errorCheckingUsername: false,
+      errorInvalidUsername: false
     };
     BlockStackUtils.init(this);
   }
 
-  _checkIfUserExists = async (name) => {
+  _addFriend = async (username) => {
     let valid;
     try {
-      valid = await BlockStackUtils.checkIfUserExists(name);
+      valid = await BlockStackUtils.checkIfUserExists(username);
+      if (valid) {
+        console.log('Valid username:', username);
+        console.log(`Adding Friend ${username}`);
+        await FirebaseUtils.addFriend(BlockStackUtils.getUsername(this), username);
+        this.setState({ 
+          isUserameValid: true,
+          errorInvalidUsername: false,
+          linkToOpen: `/app/chats/${username}/`
+        });
+      }
+      else {
+        console.log('Invalid username:', username);
+        this.setState({ 
+          isUserameValid: false,
+          errorInvalidUsername: true
+        });
+      }
     }
     catch (e) {
       console.error(e);
-      this.setState({ errorCheckingFullName: true });
-      return;
-    }
-
-    if (valid) {
-      console.log('Valid Username', name);
-      BlockStackUtils.addFriend(this, name);
-      this.setState({ 
-        isFullNameValid: true,
-        errorInvalidFullName: false
-      });
-    }
-    else {
-      console.log('Invalid Username', name);
-      this.setState({ 
-        isFullNameValid: false,
-        errorInvalidFullName: true
-      });
+      this.setState({ errorCheckingUsername: true });
     }
   }
 
   _errorDialogOk = () => {
-    const { errorCheckingFullName, errorInvalidFullName } = this.state;
-    if (errorInvalidFullName) {
-      this.setState({ errorInvalidFullName: false });
+    const { errorCheckingUsername, errorInvalidUsername } = this.state;
+    if (errorInvalidUsername) {
+      this.setState({ errorInvalidUsername: false });
     }
-    else if (errorCheckingFullName) {
-      this.setState({ errorCheckingFullName: false });
+    else if (errorCheckingUsername) {
+      this.setState({ errorCheckingUsername: false });
     }
   }
 
   _renderErrorDialog = (classes) => {
-    const { errorCheckingFullName, errorInvalidFullName } = this.state;
+    const { errorCheckingUsername, errorInvalidUsername } = this.state;
 
     return (
       <Dialog
         fullScreen={false}
-        open={errorInvalidFullName || errorCheckingFullName}
+        open={errorInvalidUsername || errorCheckingUsername}
         onClose={this._errorDialogOk}
         aria-labelledby="responsive-dialog-title">
-        <DialogTitle id="responsive-dialog-title">{errorCheckingFullName ? 'Connection' : 'Invalid Username'} Error</DialogTitle>
+        <DialogTitle id="responsive-dialog-title">{errorCheckingUsername ? 'Connection' : 'Invalid Username'} Error</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {
-              errorCheckingFullName ? 
-              'The username that you entered wasn\'t found. Please check your spelling the try again.' :
+              errorInvalidUsername ? 
+              'The username that you entered wasn\'t found. Please check your spelling then try again.' :
               'An error occured while checking the username. Please check your Internet connection then try again.'
             }
           </DialogContentText>
@@ -99,6 +100,8 @@ class AddFriend extends React.Component {
   }
 
   _renderSearchBox = (classes) => {
+    const { friendUsername } = this.state;
+
     return (
       <Box className={classes.searchBoxContainer}>
         <TextField
@@ -113,13 +116,13 @@ class AddFriend extends React.Component {
               <PersonAdd size="large" />
             </InputAdornment>,
             endAdornment: <InputAdornment position="start" style={{ marginRight: '-8px' }}>
-              <Button variant="contained" onClick={e => this._checkIfUserExists(e.target.value)} color="primary" size="large">
+              <Button variant="contained" onClick={e => this._addFriend(friendUsername)} color="primary" size="large">
                 <Typography variant="button" style={{ width: '100px' }}>Add Friend</Typography>
               </Button>
             </InputAdornment>,
           }}
-          value={this.state.fullName}
-          onChange={e => this.setState({ fullName: e.target.value })}
+          value={this.state.friendUsername}
+          onChange={e => this.setState({ friendUsername: e.target.value })}
           margin="normal"
           InputLabelProps={{ shrink: true }}
         />
@@ -129,10 +132,17 @@ class AddFriend extends React.Component {
 
   render () {
     const { classes } = this.props;
+    const { linkToOpen, friendUsername } = this.state;
 
     if (!BlockStackUtils.isSignedInOrPending(this)) {
       return (
         <Redirect to='/sign-in/' />
+      )
+    }
+
+    if (linkToOpen) {
+      return (
+        <Redirect to={linkToOpen} />
       )
     }
 

@@ -21,51 +21,73 @@ import {
 import { Message } from '@material-ui/icons';
 import Header from './Header';
 import BlockStackUtils from '../lib/BlockStackUtils';
+import FirebaseUtils from '../lib/FirebaseUtils';
 import { Redirect } from 'react-router-dom';
+import _ from 'lodash';
+
+const TIME_FREQUENCY = 10;
 
 class Chat extends React.Component {
   constructor (props) {
     super(props);
 
-    this.from = 'okibeogezi.id.blockstack';
-    this.to = 'moxiegirl.id.blockstack';
+    BlockStackUtils.init(this);
+    this.senderUsername = BlockStackUtils.getUsername(this);
+    this.receiverUsername = this.props.match.params.friendUsername;
     this.state = { 
       message: '',
       messages: [],
+      newMessages: [],
       isLoadingMessages: false,
       errorLoadingMessages: false,
-      errorSendingMessage: false
+      errorSendingMessage: false,
+      inBackground: false,
     };
-    BlockStackUtils.init(this);
   }
 
   componentDidMount () {
     this._loadMessages();
-    BlockStackUtils.checkMessagesPeriodically(this, (message) => {
-      console.log('New Message Received');
-    });
+  }
+
+  componentWillUnmount () {
+    this.setState({ inBackground: true });
   }
 
   componentDidUpdate () {
     this._goToBottom();
   }
 
-  _loadMessages = async () => {
-    const { from, to } = this;
-    this.setState({ isLoadingMessages: true });
+  _loadMessages = async (repeatIndefinitely = true, timeFrequency = TIME_FREQUENCY, isRepeat = false) => {
+    const { senderUsername, receiverUsername } = this;
+    const { inBackground, sendPending } = this.state;
+    !isRepeat && this.setState({ isLoadingMessages: true });
+
     try {
-      const messages = await BlockStackUtils.loadMessages(this, from, to);
-      this.setState({ 
-        errorLoadingMessages: false,
-        messages
-      });
+      const messages = await FirebaseUtils.loadMessages(senderUsername, receiverUsername);
+      if (sendPending) {
+        this.setState({ errorLoadingMessages: false });
+      }
+      else {
+        this.setState({ 
+          errorLoadingMessages: false,
+          messages: messages
+        });
+      }
+      if (repeatIndefinitely && !inBackground) {
+        console.log(`Checking messages in ${timeFrequency} seconds`);
+        setTimeout(() => {
+            console.log(`Checking messages now`);
+            this._loadMessages(repeatIndefinitely, timeFrequency, true);
+          },
+          timeFrequency * 1000);
+      }
     }
     catch (e) {
-      this.setState({ errorLoadingMessages: true });
+      !isRepeat && this.setState({ errorLoadingMessages: true });
       console.error(e);
     }
     finally {
-      this.setState({ isLoadingMessages: false });
+      !isRepeat && this.setState({ isLoadingMessages: false });
     }
   }
 
@@ -74,15 +96,18 @@ class Chat extends React.Component {
   }
 
   _onClickSend = async (messageBody) => {
-    const { from, to } = this;
+    const { senderUsername, receiverUsername } = this;
+    const newMessage = {
+      senderUsername, receiverUsername, timestamp: Date.now(), body: messageBody, type: 'text'
+    };
     this.setState({ 
       message: '',
-      messages: this.state.messages.concat({
-        from, to, timestamp: Date.now(), body: messageBody, type: 'text'
-      }) 
+      messages: this.state.messages.concat(newMessage)
     });
     try {
-      await BlockStackUtils.sendMessage(this, messageBody, from, to);
+      this.setState({ sendPending: true });
+      await FirebaseUtils.sendMessage(messageBody, senderUsername, receiverUsername);
+      this.setState({ sendPending: false });
     }
     catch (e) {
       this.setState({ errorSendingMessage: true });
@@ -162,7 +187,7 @@ class Chat extends React.Component {
 
   render () {
     const { classes } = this.props;
-    const { to } = this;
+    const { receiverUsername } = this;
     const { isLoadingMessages, messages } = this.state;
 
     if (!BlockStackUtils.isSignedInOrPending(this)) {
@@ -174,31 +199,32 @@ class Chat extends React.Component {
     return (
       <Box align="center" className={classes.container}>
         <Typography align="center" className={classes.header} variant="h6">
-          <i><u>{to.toUpperCase()}</u></i>
+          <i><u>{receiverUsername.toUpperCase()}</u></i>
         </Typography>
         { isLoadingMessages && <CircularProgress /> }
         {
           isLoadingMessages ? '' :
+          messages.length ?
           <List style={{ marginBottom: '80px' }} component="nav" aria-label="main mailbox folders">
             {
               messages.map(message => (
                 <ListItem key={message.timestamp} className={classes.message}
                   style={{ 
-                    justifyContent: `${message.to === this.from ? 'flex-start' : 'flex-end'}`
+                    justifyContent: `${message.receiverUsername === this.senderUsername ? 'flex-start' : 'flex-end'}`
                   }}>
                   <Card 
                     style={{ maxWidth: '70%' }} 
-                    className={message.to === this.from ? classes.messageCardStart : classes.messageCardEnd}>
+                    className={message.receiverUsername === this.senderUsername ? classes.messageCardStart : classes.messageCardEnd}>
                     <CardContent 
                       style={{ 
                         paddingBottom: '16px',
-                        backgroundColor: `${message.to === this.from ? 'lightgrey' : '#00D4AA'}`
+                        backgroundColor: `${message.receiverUsername === this.senderUsername ? 'lightgrey' : '#00D4AA'}`
                       }} 
                       className={classes.messageCardContent}>
                       <Typography 
                         style={{
-                          color: `${message.to === this.from ? '#00D4AA' : 'white'}`,
-                          fontWeight: `${message.to === this.from ? '500' : '400'}`
+                          color: `${message.receiverUsername === this.senderUsername ? '#00D4AA' : 'white'}`,
+                          fontWeight: `${message.receiverUsername === this.senderUsername ? '500' : '400'}`
                         }}
                         className={classes.messageText}>
                         {message.body}
@@ -208,7 +234,8 @@ class Chat extends React.Component {
                 </ListItem>
               ))
             }
-          </List>
+          </List> :
+          <Typography variant="button">No Messages Yet.</Typography>
         }
         { this._renderSendMessageBox(classes) }
         { this._renderErrorDialog(classes) }

@@ -21,7 +21,7 @@ const Routes = () => {
       <Route path="/app/" exact component={AppHome} />
       <Route path="/app/add/friend/" exact component={AddFriend} />
       <Route path="/app/chats/" exact component={ChatList} />
-      <Route path="/app/chats/:fullName/" exact component={Chat} />
+      <Route path="/app/chats/:friendUsername/" exact component={Chat} />
     </Switch>
   )
 };

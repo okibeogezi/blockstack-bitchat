@@ -12,6 +12,7 @@ import {
 import { BrowserRouter as Router } from 'react-router-dom';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
+import FirebaseUtils from './lib/FirebaseUtils';
 
 const theme = createMuiTheme({ palette: { 
   primary: {
@@ -25,6 +26,10 @@ const theme = createMuiTheme({ palette: {
 }});
 
 export default class App extends React.Component {
+  constructor (props) {
+    super(props);
+    FirebaseUtils.init(this);
+  }
   render () {
     return (
       <MuiThemeProvider theme={theme}>

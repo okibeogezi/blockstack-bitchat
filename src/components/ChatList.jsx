@@ -11,6 +11,7 @@ import {
   DialogActions,
   CircularProgress,
   List,
+  Typography,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -23,6 +24,7 @@ import {
 } from '@material-ui/icons';
 import Header from './Header';
 import BlockStackUtils from '../lib/BlockStackUtils';
+import FirebaseUtils from '../lib/FirebaseUtils';
 import { Redirect } from 'react-router-dom';
 
 // Query: https://core.blockstack.org/v1/search?query=okibeogezi.id.blockstack
@@ -47,7 +49,7 @@ class ChatList extends React.Component {
   _loadFriends = async () => {
     this.setState({ isLoadingFriends: true });
     try {
-      const friends = await BlockStackUtils.loadFriends(this);
+      const { friends } = await FirebaseUtils.loadFriends(BlockStackUtils.getUsername(this));
       this.setState({ 
         errorLoadingFriends: false,
         friends
@@ -62,11 +64,11 @@ class ChatList extends React.Component {
     }
   }
 
-  _onClickFriend = ({ name }) => {
-    console.log(name, 'friend clicked');
+  _onClickFriend = (username) => {
+    console.log(username, 'friend clicked');
     this.setState({ 
       isGoingToChat: true,
-      destinationFullName: name
+      destinationFullName: username
     });
   }
 
@@ -123,22 +125,24 @@ class ChatList extends React.Component {
         { isLoadingFriends && <CircularProgress /> }
         {
           isLoadingFriends ? '' :
+          friends.length ?
           <List component="nav" aria-label="main mailbox folders">
             {
-              friends.map(friend => (
-                <Box key={friend.name}>
+              friends.map(({ username }, i) => (
+                <Box key={i}>
                   <Divider />
-                  <ListItem key={friend.name} button onClick={e => this._onClickFriend(friend)}>
+                  <ListItem key={username} button onClick={e => this._onClickFriend(username)}>
                     <ListItemIcon>
                       <Person />
                     </ListItemIcon>
-                    <ListItemText primary={friend.name} />
+                    <ListItemText primary={username} />
                   </ListItem>
                   <Divider />
                 </Box>
               ))
             }
-          </List>
+          </List> :
+          <Typography variant="button">No Friends Yet.</Typography>
         }
       </Box>
     );
