@@ -10,7 +10,7 @@ export default class BlockStackUtils {
   }
 
   static isSignedInOrPending (that) {
-    return true;
+    // return true;
     const session = that.userSession;
 
     if (session.isUserSignedIn()) {
