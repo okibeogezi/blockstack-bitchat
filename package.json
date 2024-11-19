@@ -9,7 +9,7 @@
     "clsx": "^1.0.4",
     "cryptocompare": "^1.0.0",
     "file-saver": "^2.0.2",
-    "firebase": "^6.2.3",
+    "firebase": "^10.9.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-number-format": "^4.0.8",
